@@ -4,11 +4,11 @@
 #include "math.h"
 #include <fstream>
 
-#define SQRT_INTEROP  
+#define SQRT_INTERPO
+//#define DEBUG
 
-
-double sqrt_interop(double ub, double lb, double in,double in_concentration,bool isub);
-double linear_interop(double ub, double lb, double in,double in_concentration,bool isub);
+double sqrt_interpo(double ub, double lb, double in,double in_concentration,bool isub);
+double linear_interpo(double ub, double lb, double in,double in_concentration,bool isub);
 
 
 using namespace std;
@@ -16,9 +16,9 @@ using namespace std;
 int main( int argc, char * argv[] )
 {
   
-  char tmp[256];                // buffer for parsing
-  ifstream fin("input.txt");    // input stream
-  ofstream fout("out.txt");      // output stream
+  char tmp[256];                  // buffer for parsing
+	ifstream fin;										// input stream
+	ofstream fout;									// output stream
 
   // Input Parameters
   bool flag = false;            // flag 
@@ -36,45 +36,65 @@ int main( int argc, char * argv[] )
   int lb_temp_idx;                  // lower bound temperature index
   double ub_concentration;          // upper bound
   double lb_concentration;          // lower bound
-//int up_idxtmp, lo_idxtmp;         //temperature index 
+//int up_idxtmp, lo_idxtmp;         // temperature index 
 
-  cout << "Please select upper bound temperature & index" << endl;
-  cin >> ub_temp ;//>> up_idxtmp ;
-  cout << "Please select lower bound temperature & index" << endl;
-  cin >> lb_temp ;//>> lo_idxtmp;
+	// if input arguments < 4, leave
+	if(argc < 5)
+		return -1;
 
-  // decide input, upper and lower temp
-  // 99->300k, 92->600k, 88->900k,, 85->1200k
-  switch (ub_temp)
-  {
-    case 300:
-      ub_temp_idx = 99;
-      break;
-    case 600:
-      ub_temp_idx = 92;
-      break;
-    case 900:
-      ub_temp_idx = 88;
-      break;
-    case 1200:
-      ub_temp_idx = 85;
-      break;
-  }
-  switch (lb_temp)
-  {
-    case 300:
-      lb_temp_idx = 99;
-      break;
-    case 600:
-      lb_temp_idx = 92;
-      break;
-    case 900:
-      lb_temp_idx = 88;
-      break;
-    case 1200:
-      lb_temp_idx = 85;
-      break;
-  }
+	// check input arguments
+	if(!argv[1] || !argv[2])
+		return -1;
+	else
+	{
+		char tmp[256];
+		//wcstombs(tmp,argv[1],sizeof(tmp));    // this may be unnecessary because argv is of type _tchar
+		ub_temp = atoi(tmp);                  // 1st argument->upper temperature
+		//wcstombs(tmp,argv[2],sizeof(tmp));    // this may be unnecessary because argv is of type _tchar
+		lb_temp = atoi(tmp);                  // 2nd argument->lower temperature
+
+#ifdef DEBUG
+		cout << ub_temp << ' ' << lb_temp << endl;
+#endif
+	}
+	if(!argv[3] || !argv[4])					      // 3rd srgument->input filename,4th srgument->output filename
+		return -1;										
+	else
+	{
+		fin.open(argv[3]);
+		fout.open(argv[4]);
+	}
+		
+	// build temperature map
+	map<int,int> hm;
+	hm[300] = 70;
+	hm[350] = 35;
+	hm[400] = 40;
+	hm[450] = 45;
+	hm[500] = 50;
+	hm[550] = 55;
+	hm[600] = 71;
+	hm[650] = 70;
+	hm[700] = 69;
+	hm[750] = 75;
+	hm[800] = 80;
+	hm[850] = 85;
+	hm[900] = 72;
+	hm[950] = 95;
+	hm[1000] = 16;
+	hm[1050] = 21;
+	hm[1100] = 22;
+	hm[1150] = 23;
+	hm[1200] = 73;
+		 
+
+	// decide input, upper and lower temp
+	ub_temp_idx = hm[ub_temp];
+	lb_temp_idx = hm[lb_temp];
+	
+	// no such temperature
+	if(ub_temp_idx == 0 ||lb_temp_idx == 0)
+	  return -1;
 
   while(fin.getline(tmp,256))
   {
@@ -97,34 +117,27 @@ int main( int argc, char * argv[] )
           break;
       }
       
-      // input temperature
-      switch (in_temp_idx)
-      {
-        case 99:
-          in_temp = 300;
-          break;
-        case 92:
-          in_temp = 600;
-          break;
-        case 88:
-          in_temp = 900;
-          break;
-        case 85:
-          in_temp = 1200;
-          break;
-      }
+			// get input temperature
+			for(map<int,int>::iterator i = hm.begin(); i != hm.end(); i++)
+			{
+				if(i->second == in_temp_idx)
+				{
+					in_temp = i->first;
+					break;
+				}
+			}
 
       //calculation two concentration
-#ifdef SQRT_INTEROP
-      ub_concentration = sqrt_interop(ub_temp,lb_temp,in_temp,in_concentration,true);
-      lb_concentration = sqrt_interop(ub_temp,lb_temp,in_temp,in_concentration,false);
+#ifdef SQRT_INTERPO
+      ub_concentration = sqrt_interpo(ub_temp,lb_temp,in_temp,in_concentration,true);
+      lb_concentration = sqrt_interpo(ub_temp,lb_temp,in_temp,in_concentration,false);
       // verify the interpolation
       if ( (in_concentration - ub_concentration - lb_concentration) / in_concentration > 1e-3 )
       {  cout << "    Wrong SQRT interpolated\n"; }
       //cout << "SQRT interpolation\n";
 #else
-      ub_concentration = linear_interop(ub_temp,lb_temp,in_temp,in_concentration,true);
-      lb_concentration = linear_interop(ub_temp,lb_temp,in_temp,in_concentration,false);
+      ub_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,true);
+      lb_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,false);
       // verify the interpolation
       if ( (in_concentration - ub_concentration - lb_concentration) / in_concentration > 1e-3 )
       {  cout << "    Wrong Linear interpolated\n"; }
@@ -158,7 +171,7 @@ int main( int argc, char * argv[] )
   return 0;
 }
 
-double sqrt_interop(double ub, double lb, double in,double in_concentration,bool isub)
+double sqrt_interpo(double ub, double lb, double in,double in_concentration,bool isub)
 {
   if(isub == true)
     return in_concentration / (sqrt(ub) - sqrt(lb)) * (sqrt(in) - sqrt(lb));
@@ -166,7 +179,7 @@ double sqrt_interop(double ub, double lb, double in,double in_concentration,bool
     return in_concentration / (sqrt(ub) - sqrt(lb)) * (sqrt(ub) - sqrt(in));
 }
 
-double linear_interop(double ub, double lb, double in,double in_concentration,bool isub)
+double linear_interpo(double ub, double lb, double in,double in_concentration,bool isub)
 {
   if(isub == true)
     return in_concentration / (ub - lb) * (in - lb);
