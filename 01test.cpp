@@ -3,6 +3,7 @@
 #include "stdlib.h"
 #include "math.h"
 #include <fstream>
+#include <map>
 
 #define SQRT_INTERPO
 //#define DEBUG
