@@ -16,7 +16,6 @@ using namespace std;
 
 int main( int argc, char * argv[] )
 {
-  
   char tmp[256];                  // buffer for parsing
 	ifstream fin;										// input stream
 	ofstream fout;									// output stream
@@ -37,34 +36,34 @@ int main( int argc, char * argv[] )
   int lb_temp_idx;                  // lower bound temperature index
   double ub_concentration;          // upper bound
   double lb_concentration;          // lower bound
-//int up_idxtmp, lo_idxtmp;         // temperature index 
 
 	// if input arguments < 4, leave
 	if(argc < 5)
 		return -1;
-
+  
 	// check input arguments
-	if(!argv[1] || !argv[2])
+	if(!argv[1] || !argv[2] || !argv[3] || !argv[4])
 		return -1;
-	else
-	{
-		char tmp[256];
-		//wcstombs(tmp,argv[1],sizeof(tmp));    // this may be unnecessary because argv is of type _tchar
-		ub_temp = atoi(tmp);                  // 1st argument->upper temperature
-		//wcstombs(tmp,argv[2],sizeof(tmp));    // this may be unnecessary because argv is of type _tchar
-		lb_temp = atoi(tmp);                  // 2nd argument->lower temperature
-
+	//wcstombs(tmp,argv[1],sizeof(tmp));    // this may be unnecessary because argv is of type _tchar
+	ub_temp = atoi(argv[1]);                // 1st argument->upper temperature
+	//wcstombs(tmp,argv[2],sizeof(tmp));    // this may be unnecessary because argv is of type _tchar
+	lb_temp = atoi(argv[2]);                // 2nd argument->lower temperature
+  if (lb_temp > ub_temp)                  // correct lb_temp and ub_temp relationship
+  {
+    in_temp = ub_temp;
+    ub_temp = lb_temp;
+    lb_temp = in_temp;
+    in_temp = 0;
+  }
+  else if (lb_temp == ub_temp)
+    return -1;
 #ifdef DEBUG
 		cout << ub_temp << ' ' << lb_temp << endl;
 #endif
-	}
-	if(!argv[3] || !argv[4])					      // 3rd srgument->input filename,4th srgument->output filename
-		return -1;										
-	else
-	{
-		fin.open(argv[3]);
-		fout.open(argv[4]);
-	}
+
+  // 3rd srgument->input filename,4th srgument->output filename
+	fin.open(argv[3]);
+	fout.open(argv[4]);
 		
 	// build temperature map
 	map<int,int> hm;
@@ -132,18 +131,19 @@ int main( int argc, char * argv[] )
 #ifdef SQRT_INTERPO
       ub_concentration = sqrt_interpo(ub_temp,lb_temp,in_temp,in_concentration,true);
       lb_concentration = sqrt_interpo(ub_temp,lb_temp,in_temp,in_concentration,false);
-      // verify the interpolation
-      if ( (in_concentration - ub_concentration - lb_concentration) / in_concentration > 1e-3 )
-      {  cout << "    Wrong SQRT interpolated\n"; }
-      //cout << "SQRT interpolation\n";
+#ifdef DEBUG
+      cout << "    SQRT interp:" << head << " " << in_isotope << endl;
+#endif
 #else
       ub_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,true);
       lb_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,false);
+#ifdef DEBUG  
+      cout << "    LINE interp:" << head << " " << in_isotope << endl;
+#endif
+#endif
       // verify the interpolation
       if ( (in_concentration - ub_concentration - lb_concentration) / in_concentration > 1e-3 )
-      {  cout << "    Wrong Linear interpolated\n"; }
-      //cout << "Linear interpolation\n";
-#endif
+        cout << "    Interpolation fails in total amount" << head << ":" << in_isotope << endl;
 
       // output
       switch (tmp[0])
@@ -187,3 +187,4 @@ double linear_interpo(double ub, double lb, double in,double in_concentration,bo
   else
     return in_concentration / (ub - lb) * (ub - in);
 }
+
