@@ -24,7 +24,6 @@ int main( int argc, char * argv[] )
   bool flag = false;            // flag 
   int in_isotope;
   float in_concentration;
-  char in_c;
   char head[5];
 
   // calculation Parameters
@@ -98,9 +97,9 @@ int main( int argc, char * argv[] )
 
   while(fin.getline(tmp,256))
   {
-    if(tmp[0] == 'm' && atoi(tmp+1))     // 'mx' format, where x is an integer
+    if(tmp[0] == 'm' && (tmp[1] == 't' || atoi(tmp+1)))     // 'mx' or 'mtx' format, where x is an integer
       flag = true;
-    else if(tmp[0] == 'c')               // 'c' is comment
+    else if(tmp[0] == 'c')				    // 'c' is comment																// 'c' is comment
       flag = false;
 
     // main calculation
@@ -109,23 +108,26 @@ int main( int argc, char * argv[] )
       // parsing input parameters
       switch (tmp[0])
       {
-        case 'm':
-          sscanf(tmp,"%5s %d.%d%c %e",&head, &in_isotope, &in_temp_idx, &in_c, &in_concentration);
-          break;
-        case ' ':
-          sscanf(tmp,"%d.%d%c %e", &in_isotope, &in_temp_idx, &in_c, &in_concentration);
-          break;
+	case 'm':
+	  if (tmp[1] == 't')
+	    sscanf(tmp,"%s %*s.%d%*c",&head, &in_temp_idx);
+	  else
+	    sscanf(tmp,"%s %d.%d%*c %e",&head, &in_isotope, &in_temp_idx, &in_concentration);
+	  break;
+	case ' ':
+	  sscanf(tmp,"%d.%d%*c %e", &in_isotope, &in_temp_idx, &in_concentration);
+	  break;
       }
-      
-			// get input temperature
-			for(map<int,int>::iterator i = hm.begin(); i != hm.end(); i++)
-			{
-				if(i->second == in_temp_idx)
-				{
-					in_temp = i->first;
-					break;
-				}
-			}
+
+	// get input temperature
+	for(map<int,int>::iterator i = hm.begin(); i != hm.end(); i++)
+	{
+		if(i->second == in_temp_idx)
+		{
+			in_temp = i->first;
+			break;
+		}
+	}
 
       //calculation two concentration
 #ifdef SQRT_INTERPO
@@ -149,17 +151,31 @@ int main( int argc, char * argv[] )
       switch (tmp[0])
       {
         case 'm':  
-          fout <<  left << setw(5)  << head ;
+	  fout <<  left << setw(5)  << head ;
+	  if(tmp[1] == 't')
+	  {
+	    fout << right << setw(1)  << "graph." << lb_temp_idx << "t  "
+		 << right << setw(2)  << "graph." << ub_temp_idx << "t "
+		 << endl;
+	  }
+	  else
+	  {
+	    fout << right << setw(7)  << in_isotope << '.' << lb_temp_idx << "c " 
+		 << right << setw(11) << scientific << uppercase << setprecision(4) << lb_concentration 
+		 << right << setw(7)  << in_isotope << '.' << ub_temp_idx << "c " 
+		 << right << setw(11) << scientific << uppercase << setprecision(4) << ub_concentration 
+		 << endl;
+	  }
           break;
         case ' ':
           fout << "     ";
+	  fout << right << setw(7)  << in_isotope << '.' << lb_temp_idx << "c " 
+	       << right << setw(11) << scientific << uppercase << setprecision(4) << lb_concentration 
+	       << right << setw(7)  << in_isotope << '.' << ub_temp_idx << "c " 
+	       << right << setw(11) << scientific << uppercase << setprecision(4) << ub_concentration 
+	       << endl;
           break;
       }
-      fout << right << setw(7)  << in_isotope << '.' << lb_temp_idx << "c " 
-           << right << setw(11) << scientific << uppercase << setprecision(4) << lb_concentration 
-           << right << setw(7)  << in_isotope << '.' << ub_temp_idx << "c " 
-           << right << setw(11) << scientific << uppercase << setprecision(4) << ub_concentration 
-           << endl;
     }
     else
       fout << tmp << endl;
