@@ -46,9 +46,8 @@ int _tmain( int argc, char * argv[] )
 	if(!argv[1] || !argv[2] || !argv[3] || !argv[4] || !argv[5] || !argv[6])
 		return -1;
 
-	char tmp[256];
-	ub_temp = atoi(tmp);
-	lb_temp = atoi(tmp);
+	ub_temp = atoi(argv[2]);
+	lb_temp = atoi(argv[3]);
 
   // open input and output file
 	fin.open(argv[3]);
