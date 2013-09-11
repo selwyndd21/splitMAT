@@ -1,3 +1,4 @@
+#include <iostream>
 #include "stdio.h"
 #include "mapclass.h"
 
@@ -37,6 +38,9 @@ int mapclass::get_key(int value)
 			return i->first;
 		}
 	}
+  //---------- verify target temperature ---------//
+  std::cout << "wrong target temperature index: no target temperature \n";
+  //----------------------------------------//
 	return -1;
 }
 
@@ -51,3 +55,4 @@ int mapclass::get_key(int value) const
 	}
 	return -1;
 }
+

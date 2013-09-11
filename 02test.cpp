@@ -16,7 +16,7 @@ double linear_interpo(double ub, double lb, double in,double in_concentration,bo
 
 using namespace std;
 
-int _tmain( int argc, char * argv[] )
+int main( int argc, char * argv[] )
 {
 	
 	char charline[256];									// buffer for parsing every input line
@@ -46,8 +46,8 @@ int _tmain( int argc, char * argv[] )
 	if(!argv[1] || !argv[2] || !argv[3] || !argv[4] || !argv[5] || !argv[6])
 		return -1;
 
-	ub_temp = atoi(argv[2]);
-	lb_temp = atoi(argv[3]);
+	ub_temp = atoi(argv[1]);
+	lb_temp = atoi(argv[2]);
 
   // open input and output file
 	fin.open(argv[3]);
@@ -74,9 +74,9 @@ int _tmain( int argc, char * argv[] )
 			fout <<  left << setw(5)  << strhead ;
 			while(ss >> strisotope)					// read input isotope
 			{
-				strisotope.replace(strisotope.find('.') + 1, 2, hm_mt.get_value(lb_temp));
+				strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_mt.get_value(lb_temp)));
 				fout << setw(10) << strisotope;
-				strisotope.replace(strisotope.find('.') + 1, 2, hm_mt.get_value(ub_temp));
+				strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_mt.get_value(ub_temp)));
 				fout << setw(10) << strisotope;
 			}
 			fout << endl;
@@ -107,10 +107,10 @@ int _tmain( int argc, char * argv[] )
 				ub_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,true);
 				lb_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,false);
 #endif
-				strisotope.replace(strisotope.find('.') + 1, 2, hm_m.get_value(lb_temp));
+				strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_m.get_value(lb_temp)));
 				fout << right << setw(7)  << strisotope
 					 << right << setw(13) << scientific << uppercase << setprecision(4) << lb_concentration;
-				strisotope.replace(strisotope.find('.') + 1, 2, hm_m.get_value(ub_temp));
+				strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_m.get_value(ub_temp)));
 				fout << right << setw(13) << strisotope
 				     << right << setw(13) << scientific << uppercase << setprecision(4) << ub_concentration 
 				     << endl;
@@ -145,10 +145,10 @@ int _tmain( int argc, char * argv[] )
 					ub_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,true);
 					lb_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,false);
 	#endif
-					strisotope.replace(strisotope.find('.') + 1, 2, hm_m.get_value(lb_temp));
+					strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_m.get_value(lb_temp)));
 					fout << right << setw(13)  << strisotope 
 						 << right << setw(13) << scientific << uppercase << setprecision(4) << lb_concentration;
-					strisotope.replace(strisotope.find('.') + 1, 2, hm_m.get_value(ub_temp));
+					strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_m.get_value(ub_temp)));
 					fout << right << setw(13)  << strisotope
 						 << right << setw(13) << scientific << uppercase << setprecision(4) << ub_concentration 
 						 << endl;

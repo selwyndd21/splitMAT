@@ -1,0 +1,13 @@
+1. input output files are in "verification"
+2. old read flux scripts are in "example"
+3. 01test.cpp --> install cpp split program 20130904
+4. mapCE.txt and mapSAB.txt: the temperature name file
+5. 02test.cpp: new version of code.
+  -->  ./pseudoMAT ub_temp lb_temp input output mapCE.txt mapSAB.txt
+  like ./pseudoMAT 1200 300 input output mapCE.txt mapSAB.txt
+
+  *Problem: temperature near 300 K is not exact 300K.
+
+6. 03test.cpp: correct the condition choice.
+
+  *Problem: flag would reset after m-card and mt-card.
