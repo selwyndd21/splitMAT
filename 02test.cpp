@@ -74,9 +74,9 @@ int _tmain( int argc, char * argv[] )
 			fout <<  left << setw(5)  << strhead ;
 			while(ss >> strisotope)					// read input isotope
 			{
-				strisotope.replace(strisotope.find('.') + 1, 2, hm_mt.get_value(lb_temp));
+				strisotope.replace(strisotope.find('.') + 1, 2, stoi(hm_mt.get_value(lb_temp)));
 				fout << setw(10) << strisotope;
-				strisotope.replace(strisotope.find('.') + 1, 2, hm_mt.get_value(ub_temp));
+				strisotope.replace(strisotope.find('.') + 1, 2, stoi(hm_mt.get_value(ub_temp)));
 				fout << setw(10) << strisotope;
 			}
 			fout << endl;
@@ -107,10 +107,10 @@ int _tmain( int argc, char * argv[] )
 				ub_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,true);
 				lb_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,false);
 #endif
-				strisotope.replace(strisotope.find('.') + 1, 2, hm_m.get_value(lb_temp));
+				strisotope.replace(strisotope.find('.') + 1, 2, stoi(hm_m.get_value(lb_temp)));
 				fout << right << setw(7)  << strisotope
 					 << right << setw(13) << scientific << uppercase << setprecision(4) << lb_concentration;
-				strisotope.replace(strisotope.find('.') + 1, 2, hm_m.get_value(ub_temp));
+				strisotope.replace(strisotope.find('.') + 1, 2, stoi(hm_m.get_value(ub_temp)));
 				fout << right << setw(13) << strisotope
 				     << right << setw(13) << scientific << uppercase << setprecision(4) << ub_concentration 
 				     << endl;
@@ -145,10 +145,10 @@ int _tmain( int argc, char * argv[] )
 					ub_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,true);
 					lb_concentration = linear_interpo(ub_temp,lb_temp,in_temp,in_concentration,false);
 	#endif
-					strisotope.replace(strisotope.find('.') + 1, 2, hm_m.get_value(lb_temp));
+					strisotope.replace(strisotope.find('.') + 1, 2, stoi(hm_m.get_value(lb_temp)));
 					fout << right << setw(13)  << strisotope 
 						 << right << setw(13) << scientific << uppercase << setprecision(4) << lb_concentration;
-					strisotope.replace(strisotope.find('.') + 1, 2, hm_m.get_value(ub_temp));
+					strisotope.replace(strisotope.find('.') + 1, 2, stoi(hm_m.get_value(ub_temp)));
 					fout << right << setw(13)  << strisotope
 						 << right << setw(13) << scientific << uppercase << setprecision(4) << ub_concentration 
 						 << endl;
