@@ -96,7 +96,7 @@ int main( int argc, char * argv[] )
     string strline = charline;    // read line into string
     istringstream ss(strline);
 
-    if (strline[0] == 'm' && isdigit(strline[1]) == true)// "^m"+number
+    if (strline[0] == 'm' && isdigit(strline[1]))// "^m"+number
     {
       #ifdef DEBUG_line2
       cout << "    enter ^m[0-9];" ;
@@ -168,7 +168,7 @@ int main( int argc, char * argv[] )
       cout << hm_mt.get_value(lb_temp) << ' ' << hm_mt.get_value(ub_temp) << endl;
       #endif
     }
-    else if (isspace(strline[1]) == true && flag == true)// "^ " and enabled
+    else if (isspace(strline[0]) && flag == true)// "^ " and enabled
     {//only the line after m-card or mt-card belong to material
       #ifdef DEBUG_line2
       cout << "    enter ^[ ];" << endl;
