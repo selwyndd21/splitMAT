@@ -1,8 +1,11 @@
 // This file is modified by 02test.cpp in
 // commit: 5db1a19503f5d79101b2a68fd6abd9aa52469f43
-// This is not compete yet.
+// Command:
+// For interpolate material at 1050K(name as 21c)
+//  $  pseudoMAT 900 1200 mapCE.txt mapSAB.txt Input Output
 //
-// Problem: flag would reset after m-card and mt-card.
+// ToDo: 
+// The modified grph+grpx & 6000+6001 
 // 
 #include "stdlib.h"
 #include "math.h"
@@ -17,8 +20,8 @@
 #define SQRT_INTERPO  
 //#define DEBUG_pseudo
 //#define DEBUG_argv
-#define DEBUG_line1
-#define DEBUG_line2
+//#define DEBUG_line1
+//#define DEBUG_line2
 
 double sqrt_interpo(double ub, double lb, double in,double in_concentration,bool isub);
 double linear_interpo(double ub, double lb, double in,double in_concentration,bool isub);
@@ -35,6 +38,7 @@ int main( int argc, char * argv[] )
 
   // Input Parameters
   bool flag = false;                // flag 
+  int minline = 0;                  // seperate material in same line
   float in_concentration;
 
   // calculation Parameters
@@ -71,13 +75,13 @@ int main( int argc, char * argv[] )
     cout << ub_temp << ' ' << lb_temp << endl;
 #endif
 
-  // open input and output file
-  fin.open(argv[3]);
-  fout.open(argv[4]);
-
   // build temperature map
-  mapclass hm_m(argv[5]);      // map for 'm'
-  mapclass hm_mt(argv[6]);    // map for "mt"
+  mapclass hm_m(argv[3]);      // map for 'm'
+  mapclass hm_mt(argv[4]);    // map for "mt"
+
+  // open input and output file
+  fin.open(argv[5]);
+  fout.open(argv[6]);
 
 ////////////////////////////////////////////////////////////////////////////////
 //----- MAIN PROCESSING BLOCK: START
@@ -95,6 +99,7 @@ int main( int argc, char * argv[] )
     #endif
     string strline = charline;    // read line into string
     istringstream ss(strline);
+    minline = 0;  //reset flag
 
     if (strline[0] == 'm' && isdigit(strline[1]))// "^m"+number
     {
@@ -105,11 +110,15 @@ int main( int argc, char * argv[] )
       string strhead;
       string strisotope;
       ss >> strhead;                    // read "mx" head
+      minline = 0;
 
       // calculate() and split()
       fout <<  left << setw(5)  << strhead ;
       while(ss >> strisotope)            // read input isotope
       {
+        minline++;
+        if ( minline > 1 )
+          fout << "     ";
         // calculate()
         ss >> in_concentration;          // read concentration
         in_temp_idx = stoi(strisotope.substr(strisotope.find('.')+1,2));
@@ -132,7 +141,7 @@ int main( int argc, char * argv[] )
 #endif
         // split()
         strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_m.get_value(lb_temp)));
-        fout << right << setw(7)  << strisotope
+        fout << right << setw(13)  << strisotope
              << right << setw(13) << scientific << uppercase << setprecision(4) << lb_concentration;
         strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_m.get_value(ub_temp)));
         fout << right << setw(13) << strisotope
@@ -158,9 +167,9 @@ int main( int argc, char * argv[] )
       while(ss >> strisotope)          // read input isotope
       {
         strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_mt.get_value(lb_temp)));
-        fout << setw(10) << strisotope;
+        fout << right << setw(13) << strisotope;
         strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_mt.get_value(ub_temp)));
-        fout << setw(10) << strisotope;
+        fout << right << setw(13) << strisotope;
       }
       fout << endl;
 
@@ -174,6 +183,7 @@ int main( int argc, char * argv[] )
       cout << "    enter ^[ ];" << endl;
       #endif
       string strisotope;
+      minline = 0;
 
       // calculate() and split()
       while(ss >> strisotope)          // read input isotope
@@ -200,7 +210,7 @@ int main( int argc, char * argv[] )
 #endif
         // split()
         strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_m.get_value(lb_temp)));
-        fout << right << setw(13)  << strisotope 
+        fout << right << setw(18)  << strisotope 
              << right << setw(13) << scientific << uppercase << setprecision(4) << lb_concentration;
         strisotope.replace(strisotope.find('.') + 1, 2, to_string(hm_m.get_value(ub_temp)));
         fout << right << setw(13)  << strisotope
@@ -220,7 +230,6 @@ int main( int argc, char * argv[] )
   fin.close();
   fout.close();
 
-  getchar();
   return 0;
 }
 

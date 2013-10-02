@@ -10,4 +10,4 @@
 
 6. 03test.cpp: correct the condition choice.
 
-  *Problem: flag would reset after m-card and mt-card.
+
